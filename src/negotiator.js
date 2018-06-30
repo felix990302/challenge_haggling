@@ -45,7 +45,9 @@ module.exports = class {
                     );
                 }
             } else { // very first turn, initial offer
-                offer = this.makeInitialOffer((count) => Math.round(count/2));
+                offer = this.makeInitialOffer(
+                    (count) => Math.round(count/2),
+                );
             }
         } else { // go second
             if(this.roundsLeft == 0) { // last offer to make
@@ -67,18 +69,21 @@ module.exports = class {
 
     makeCompromise(offerArr, prevArr, compromiseFunc) {
         return offerArr.map(
-            (amount, ind) => compromiseFunc(amount, prevArr[ind])
+            (amount, ind) => compromiseFunc(amount, prevArr[ind]),
         );
     }
 
     makeInitialOffer(desiredFunc) {
-        return this.counts.map((count, ind) => desiredFunc(count, ind));
+        return this.allNonZeroItems.map(
+            (count, ind) => desiredFunc(count, ind),
+        );
     } 
 
     gain(offer) {
         return offer.reduce(
             (acc, count, ind) => acc + count*this.values[ind],
-            0);
+            0,
+        );
     }
 
     isAcceptable(offer, ROI) {
