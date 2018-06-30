@@ -19,3 +19,11 @@
 ## 2018-06-25
 
 * When two scripts are specified on the command line, use them in that order
+
+## 2018-06-25
+
+* More consistent logging of disconnection reasons
+
+## 2018-06-26
+
+* Added proof-of-work anti-spam measure (older clients may be asked to upgrade)

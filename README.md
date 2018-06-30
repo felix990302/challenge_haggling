@@ -82,7 +82,9 @@ See [example.js](src/example.js) for a very simple example of a negotiation scri
 
 The [haggle.js](src/haggle.js) script allows you to stage negotiations between two human agents, between a human and a script, and between two scripts. Run it with `--help` to see what it can do. You should run `npm install` in the `src` directory to install the required modules.
 
-We are going to judge the contest by running negotiations pairwise between the submitted solutions. We hope to run at least two sessions for each possible pair, but if we receive a lot of solutions, we might have to resort to a different tournament system to make testing feasible. The exact details of the tournament system will be announced later. In any case, what matters is the total value that the solution receives from all the deals it makes, not “wins” or “losses”. The winning script is the one that manages to accumulate the most value from all the deals it strikes.
+For fair and repeatable testing, the pseudo-random generator that determines the number of each type of object and their values for participants, will be initialized with fixed “seed” values (see `--seed` command-line option of `haggle.js`).
+
+We are going to judge the contest by running negotiations pairwise between the submitted solutions. (Note that only the last solution submitted by each participant will be tested.) First, each possible pair of two distinct solutions, including (A, B) and (B, A) as two separate pairings, will be tested with each of *N* randomly chosen seeds. That is, a set of seeds will be selected randomly, but every pair will get to negotiate on each of them, and each solution will get to be the first and the second in each pair. Solutions will be ranked according to the total scores they accumulate during this stage (rather than the number of “wins”). Then, *K* solutions that ranked best, will enter the finals, where *M* additional randomly chosen seeds will be used to test all possible pairings within just the *K* best solutions. The final standings among the top *K* solutions will be determined by the scores accumulated in sessions with other finalists only. This way, we'll get to test the finalists more thoroughly (on *N*+*M* seeds), and discourage participants from submitting many weak solutions (“spoilers”) to help their primary solutions win. The exact values of *N*, *M* and *K* will be announced later, as they depend on the number of solutions submitted.
 
 For the final testing, we will use the default parameters of the testing script, that is, 3 object types, up to 6 objects total, the total value for each partner $10, and a limit of 5 rounds. We recommend that solutions support all combinations of parameters that are allowed by the test script.
 
@@ -94,15 +96,20 @@ Bugs reported by participants get fixed, watch the [changelog](src/CHANGELOG.md)
 
 We are providing a server that lets your script negotiate with scripts of other participants. It works like a typical online game server: you connect to an “arena”, and the server pairs you with another participant who wants to play.
 
-Currently, we are providing one arena with the default settings (3 object types, up to 6 objects total, the total value for each partner $10, and a limit of 5 rounds). This arena does not enforce the 1-second timeout, so as to allow humans to participate. The URL to this arena is:
+| Arena                                                                    | Object types | Max total objects | Total value | Rounds | Time per turn | URL                                                    |
+| ------------------------------------------------------------------------ | ------------:| -----------------:| -----------:| -----: | -------------:| ------------------------------------------------------ |
+| [`standard`](https://hola.org/challenges/haggling/scores/standard)       |            3 |                 6 |          10 |      5 |     unlimited | `wss://hola.org/challenges/haggling/arena/standard`    |
+| [`standard_1s`](https://hola.org/challenges/haggling/scores/standard_1s) |            3 |                 6 |          10 |      5 |       1000 ms | `wss://hola.org/challenges/haggling/arena/standard_1s` |
+| [`large`](https://hola.org/challenges/haggling/scores/large)             |            5 |                10 |          20 |      8 |     unlimited | `wss://hola.org/challenges/haggling/arena/large`       |
+| [`large_1s`](https://hola.org/challenges/haggling/scores/large_1s)       |            5 |                10 |          20 |      8 |       1000 ms | `wss://hola.org/challenges/haggling/arena/large_1s`    |
 
-```
-wss://hola.org/challenges/haggling/arena/standard
-```
+The `standard_1s` arena has the settings that will be used in the final testing, while `standard` does not enforce the 1-second timeout to allow humans to participate. The `large` and `large_1s` arenas use a “larger” configuration just for fun.
 
-Use `haggle.js` to connect to it either as a human agent or with your script. In this mode, the `--id` command-line option is required: it is a unique ID that will be used to track your scores. We recommend using your email address with a random string appended to it as the ID. **We won't publish this ID.** Later on, we'll launch a leaderboard where the top average scores (that is, the average score per deal) will be published along with the *hash* of the ID.
+Use `haggle.js` to connect to it either as a human agent or with your script. Specify the URL (from the last column of the table) on the command line alone or together with a script name.In this mode, the `--id` command-line option is required: it is a unique ID that will be used to track your scores. We recommend using your email address with a *constant* random string appended to it as the ID. **We won't publish this ID.**
 
-The server and the leaderboard are purely for your information and entertainment. The leaderboard scores will have no effect on the final standings, and you are not required to use the server at all. However, it can be a useful way to see where you stand, and to accumulate learning data to improve your script.
+Click the link in the first column of the table for machine-readable statistics; individual clients are identified by the *hash of their ID*. For every client, the statistics include how many sessions it has completed (`sessions`), in how many of them an agreement was reached (`agreements`), and the total score (`score`) during the entire time since this feature was introduced (`all`) or during a specific day (UTC).
+
+The server and its statistics are purely for your information and entertainment. The scores achieved on the server will have no effect on the final standings, and you are not required to use the server at all. However, it can be a useful way to see where you stand, and to accumulate learning data to improve your script.
 
 If you have a working script, we recommend running it repeatedly whenever your computer is powered on, such as with the following UNIX shell one-liner:
 
