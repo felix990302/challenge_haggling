@@ -41,12 +41,12 @@ module.exports = class {
                         offer,
                         this.previousOffer,
                         (amount, prev) =>
-                            Math.min(Math.floor((amount+prev)/2), prev),
+                            Math.min(Math.ceil((amount+prev)/2), prev),
                     );
                 }
             } else { // very first turn, initial offer
                 offer = this.makeInitialOffer(
-                    (count) => Math.round(count/2),
+                    (count) => Math.ceil(count/2),
                 );
             }
         } else { // go second
@@ -59,7 +59,7 @@ module.exports = class {
                     offer,
                     this.previousOffer ? this.previousOffer : this.allNonZeroItems,
                     (amount, prev) =>
-                        Math.min(Math.floor((amount+prev)/2), prev),
+                        Math.min(Math.ceil((amount+prev)/2), prev),
                 );
             }
         }
