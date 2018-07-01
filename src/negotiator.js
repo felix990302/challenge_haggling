@@ -41,7 +41,7 @@ module.exports = class {
                         offer,
                         this.previousOffer,
                         (amount, prev) =>
-                            amount < prev ? Math.round((amount+prev)/2) : prev,
+                            Math.min(Math.floor((amount+prev)/2), prev),
                     );
                 }
             } else { // very first turn, initial offer
@@ -59,7 +59,7 @@ module.exports = class {
                     offer,
                     this.previousOffer ? this.previousOffer : this.allNonZeroItems,
                     (amount, prev) =>
-                        amount < prev ? Math.round((amount+prev)/2) : prev,
+                        Math.min(Math.floor((amount+prev)/2), prev),
                 );
             }
         }
